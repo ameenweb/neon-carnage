@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#100D18" />
+  <meta name="description" content="NEON CARNAGE — a one-level neon-soaked top-down action game. Vanilla JS, Canvas, original procedural art and synthesised audio." />
+  <title>NEON CARNAGE — The Last Call</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23100D18'/%3E%3Cpath d='M16 4v9M16 19v9M4 16h9M19 16h9' stroke='%23FF287F' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%2335E0E8'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game" width="640" height="360" aria-label="Neon Carnage game view"></canvas>
+
+    <div id="scanlines" class="fx-scanlines" aria-hidden="true"></div>
+
+    <!-- HUD ------------------------------------------------------------------>
+    <div id="hud" class="hidden" aria-live="polite">
+      <div class="hud-top">
+        <div class="hud-block hud-weapon">
+          <div class="hud-label">WEAPON</div>
+          <div class="hud-weapon-line">
+            <span id="hud-weapon" class="hud-main">PISTOL</span>
+            <span class="hud-ammo"><b id="hud-ammo">8</b><span id="hud-reserve" class="hud-reserve">/16</span></span>
+          </div>
+          <div id="hud-reload" class="hud-reload hidden"><i id="hud-reload-fill"></i></div>
+        </div>
+
+        <div class="hud-objective">
+          <div class="hud-label">OBJECTIVE</div>
+          <div id="hud-objective" class="hud-main">ELIMINATE THE STAFF</div>
+          <div id="hud-remaining" class="hud-sub">11 HOSTILES REMAIN</div>
+        </div>
+
+        <div class="hud-block hud-kills">
+          <div class="hud-label">KILLS</div>
+          <div class="hud-main"><b id="hud-kills">0</b><span class="hud-reserve">/<span id="hud-total">11</span></span></div>
+          <div class="hud-sub">THE LAST CALL</div>
+        </div>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="hud-score"><span class="hud-label">SCORE</span><b id="hud-score">0</b></div>
+        <div id="hud-status" class="hud-status hidden"></div>
+        <div id="hud-combo" class="hud-combo hidden">x2 COMBO</div>
+      </div>
+    </div>
+
+    <div id="crosshair" aria-hidden="true">
+      <div class="ch-inner">
+        <span class="dot"></span>
+        <i class="l"></i><i class="r"></i><i class="t"></i><i class="b"></i>
+      </div>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+
+    <!-- SCREENS ---------------------------------------------------------------->
+    <div id="screens">
+      <!-- MAIN MENU -->
+      <section id="screen-menu" class="screen menu-screen active">
+        <div class="menu-grid">
+          <div class="menu-main">
+            <div class="logo" aria-label="Neon Carnage">
+              <span class="neon-pink">NEON</span>
+              <span class="neon-cyan">CARNAGE</span>
+            </div>
+            <div class="tagline"><span>THE LAST CALL</span> <em>//</em> 1989</div>
+
+            <nav class="menu-nav" aria-label="Main menu">
+              <button class="btn" data-action="start"><span class="num">01</span><span class="txt">START GAME</span><span class="arrow">»</span></button>
+              <button class="btn" data-action="controls"><span class="num">02</span><span class="txt">CONTROLS</span><span class="arrow">»</span></button>
+              <button class="btn" data-action="settings"><span class="num">03</span><span class="txt">AUDIO / VISUAL</span><span class="arrow">»</span></button>
+              <button class="btn" data-action="credits"><span class="num">04</span><span class="txt">CREDITS</span><span class="arrow">»</span></button>
+            </nav>
+
+            <div class="menu-note">ONE NIGHT · ONE CLUB · NO WITNESSES</div>
+          </div>
+
+          <aside class="menu-side" aria-hidden="true">
+            <div class="side-card">
+              <div class="side-title">TONIGHT</div>
+              <div class="side-head">THE LAST CALL<br /><span>UNDERGROUND NIGHTCLUB</span></div>
+              <p>ELIMINATE THE STAFF.<br />FIND THE EXIT.<br />DON'T DIE.</p>
+              <div class="side-stamp">ADMIT ONE</div>
+            </div>
+            <div class="side-controls">WASD MOVE · MOUSE AIM · LMB FIRE<span>SPACE MELEE · E INTERACT · ESC PAUSE</span></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CONTROLS -->
+      <section id="screen-controls" class="screen scrim">
+        <div class="panel">
+          <div class="eyebrow">SURVIVAL BRIEF</div>
+          <h2>CONTROLS</h2>
+          <div class="control-grid">
+            <div class="key-row"><span class="key">W A S D</span><span class="act">MOVE</span></div>
+            <div class="key-row"><span class="key">MOUSE</span><span class="act">AIM</span></div>
+            <div class="key-row"><span class="key">LMB</span><span class="act">SHOOT</span></div>
+            <div class="key-row"><span class="key">SPACE</span><span class="act">MELEE</span></div>
+            <div class="key-row"><span class="key">E</span><span class="act">INTERACT / PICK UP</span></div>
+            <div class="key-row"><span class="key">R</span><span class="act">RELOAD</span></div>
+            <div class="key-row"><span class="key">Q</span><span class="act">SWITCH WEAPON</span></div>
+            <div class="key-row"><span class="key">ESC</span><span class="act">PAUSE</span></div>
+            <div class="key-row"><span class="key">ENTER</span><span class="act">RESTART</span></div>
+            <div class="key-row"><span class="key">M</span><span class="act">MUTE</span></div>
+          </div>
+          <p class="panel-note">One hit kills. Yours included. Doors open with E — or a shoulder, if you're in a hurry.</p>
+          <button class="btn back-btn" data-action="back"><span class="num">←</span><span class="txt">BACK</span></button>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="screen-settings" class="screen scrim">
+        <div class="panel settings-panel">
+          <div class="eyebrow">CALIBRATION</div>
+          <h2>AUDIO / VISUAL</h2>
+
+          <div class="setting-row">
+            <label for="set-music">MUSIC</label>
+            <input id="set-music" type="range" min="0" max="100" step="1" value="55" />
+            <span class="set-val" id="set-music-val">55%</span>
+          </div>
+          <div class="setting-row">
+            <label for="set-sfx">SFX</label>
+            <input id="set-sfx" type="range" min="0" max="100" step="1" value="75" />
+            <span class="set-val" id="set-sfx-val">75%</span>
+          </div>
+
+          <div class="setting-row toggle-row">
+            <span>MASTER MUTE</span>
+            <button class="toggle" data-toggle="muted" aria-pressed="false" aria-label="Toggle mute"><span></span></button>
+          </div>
+          <div class="setting-row toggle-row">
+            <span>SCREEN SHAKE</span>
+            <button class="toggle" data-toggle="shake" aria-pressed="true" aria-label="Toggle screen shake"><span></span></button>
+          </div>
+          <div class="setting-row toggle-row">
+            <span>BLOOD</span>
+            <button class="toggle" data-toggle="blood" aria-pressed="true" aria-label="Toggle blood"><span></span></button>
+          </div>
+          <div class="setting-row toggle-row">
+            <span>CRT SCANLINES</span>
+            <button class="toggle" data-toggle="scanlines" aria-pressed="true" aria-label="Toggle scanlines"><span></span></button>
+          </div>
+
+          <p class="panel-note">Audio is synthesised live in the browser. Press M at any time to mute.</p>
+          <button class="btn back-btn" data-action="back"><span class="num">←</span><span class="txt">BACK</span></button>
+        </div>
+      </section>
+
+      <!-- CREDITS -->
+      <section id="screen-credits" class="screen scrim">
+        <div class="panel credits-panel">
+          <div class="eyebrow">CREDITS</div>
+          <h2>NEON CARNAGE</h2>
+          <div class="credits-grid">
+            <div>
+              <div class="credit-role">DESIGN · CODE · LEVEL</div>
+              <p>Built for this project with vanilla JavaScript and Canvas 2D.</p>
+              <div class="credit-role">ART</div>
+              <p>Every character, prop, tile and effect is generated procedurally at runtime. No stock imagery, no third-party game art.</p>
+              <div class="credit-role">AUDIO</div>
+              <p>Weapons, impacts, footsteps and the synthwave score are synthesised with WebAudio — no samples, no recordings.</p>
+            </div>
+            <div>
+              <div class="credit-role">TYPEFACE</div>
+              <p>Silkscreen by Jason Kottke — SIL Open Font License 1.1. Bundled locally.</p>
+              <div class="credit-role">INSPIRATION</div>
+              <p>Top-down neon action cinema of the 1980s. All characters, names, locations and assets are original to this game.</p>
+              <div class="credit-role">NO COPYRIGHTED MUSIC OR ASSETS USED</div>
+              <p class="dim">If you hear a heartbeat, it's yours.</p>
+            </div>
+          </div>
+          <button class="btn back-btn" data-action="back"><span class="num">←</span><span class="txt">BACK</span></button>
+        </div>
+      </section>
+
+      <!-- PAUSE -->
+      <section id="screen-pause" class="screen scrim pause-screen">
+        <div class="panel pause-panel">
+          <div class="eyebrow">TAP OUT</div>
+          <h2>PAUSED</h2>
+          <div class="pause-nav">
+            <button class="btn" data-action="resume"><span class="num">01</span><span class="txt">RESUME</span></button>
+            <button class="btn" data-action="restart"><span class="num">02</span><span class="txt">RESTART</span></button>
+            <button class="btn" data-action="settings"><span class="num">03</span><span class="txt">AUDIO / VISUAL</span></button>
+            <button class="btn" data-action="menu"><span class="num">04</span><span class="txt">MAIN MENU</span></button>
+          </div>
+          <div class="panel-hint">ESC TO RESUME</div>
+        </div>
+      </section>
+
+      <!-- DEATH -->
+      <section id="screen-death" class="screen scrim death-screen">
+        <div class="death-wrap">
+          <div class="death-rule"></div>
+          <h1 class="big-red">YOU DIED</h1>
+          <div class="death-line">THE CITY DOESN'T REMEMBER YOU</div>
+          <div class="death-stats">
+            <div><span>KILLS</span><b id="death-kills">0</b></div>
+            <div><span>TIME</span><b id="death-time">0:00.00</b></div>
+            <div><span>SCORE</span><b id="death-score">0</b></div>
+          </div>
+          <div class="death-actions">
+            <button class="btn" data-action="restart"><span class="num">01</span><span class="txt">TRY AGAIN</span><span class="arrow">»</span></button>
+            <button class="btn ghost" data-action="menu"><span class="num">02</span><span class="txt">MAIN MENU</span></button>
+          </div>
+          <div class="panel-hint">PRESS ENTER TO RESTART</div>
+        </div>
+      </section>
+
+      <!-- VICTORY -->
+      <section id="screen-victory" class="screen scrim victory-screen">
+        <div class="victory-wrap">
+          <div class="eyebrow">02:47 AM · NO WITNESSES</div>
+          <h1 class="victory-title">LEVEL COMPLETE</h1>
+          <div class="victory-sub">THE LAST CALL HAS CLOSED FOR GOOD</div>
+
+          <div class="victory-body">
+            <div class="grade-box">
+              <div class="grade-label">GRADE</div>
+              <div id="vic-grade" class="grade" data-grade="D">D</div>
+            </div>
+            <div class="victory-stats">
+              <div><span>KILLS</span><b id="vic-kills">0</b></div>
+              <div><span>TIME</span><b id="vic-time">0:00.00</b></div>
+              <div><span>ACCURACY</span><b id="vic-acc">0%</b></div>
+              <div><span>DEATHS</span><b id="vic-deaths">0</b></div>
+              <div class="wide"><span>FINAL SCORE</span><b id="vic-score">0</b></div>
+            </div>
+          </div>
+
+          <div class="victory-actions">
+            <button class="btn" data-action="restart"><span class="num">01</span><span class="txt">RUN IT AGAIN</span><span class="arrow">»</span></button>
+            <button class="btn ghost" data-action="menu"><span class="num">02</span><span class="txt">MAIN MENU</span></button>
+          </div>
+          <div class="panel-hint">PRESS ENTER TO RESTART</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- BOOT -->
+    <div id="boot">
+      <div class="boot-logo"><span class="neon-pink">NEON</span> <span class="neon-cyan">CARNAGE</span></div>
+      <div class="boot-sub">BOOTING THE NIGHT</div>
+      <div class="boot-bar"><i></i></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# OS / editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+.vscode/
+.idea/
+
+# Dependencies (the game itself has none)
+node_modules/
+
+# Local build/upload output
+dist/
+.wrangler/
