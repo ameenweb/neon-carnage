@@ -8,6 +8,8 @@ Vanilla **HTML5 + CSS + JavaScript**, Canvas 2D, **no framework, no build step,
 no backend, and no runtime dependencies**. Every sprite is generated
 procedurally at boot; every sound is synthesised with WebAudio.
 
+**Play the live build:** <https://neon-carnage-da8.pages.dev/>
+
 ![NEON CARNAGE title screen](docs/screenshots/menu.png)
 
 ![Gameplay in the main club floor](docs/screenshots/gameplay.png)
@@ -234,7 +236,9 @@ npx wrangler pages deploy . --project-name neon-carnage
 ```
 
 Authenticate with `npx wrangler login` first. Upload the repository root, not a
-build folder.
+build folder. Direct upload is a snapshot: after changing the game, run the
+command again to redeploy. Use the Git integration option instead if you want
+Cloudflare to redeploy automatically on every push.
 
 ### Any other static host
 
